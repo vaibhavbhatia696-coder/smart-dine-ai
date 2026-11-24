@@ -1,4 +1,4 @@
-
+ 
 {% extends "base.html" %}
 
 {% block title %}Kitchen Display | SmartDine AI{% endblock %}
@@ -25,7 +25,7 @@
         <div>
             <span class="eyebrow">ACTIVE ORDERS</span>
             <h2>{{ orders|length }}</h2>
-            <p>Orders waiting for kitchen action</p>
+            <p>Paid orders waiting for kitchen action</p>
         </div>
 
         <div class="kitchen-summary-icon">♨</div>
@@ -50,7 +50,7 @@
                         status-preparing
                     {% elif o.status == 'Out for delivery' %}
                         status-delivery
-                    {% elif o.status == 'Ready' or o.status == 'Served' or o.status == 'Delivered' %}
+                    {% elif o.status in ['Ready', 'Served', 'Delivered'] %}
                         status-delivered
                     {% elif o.status == 'Cancelled' %}
                         status-cancelled
@@ -99,13 +99,12 @@
 
             <div class="kitchen-order-details">
                 <span class="eyebrow">ORDER ITEMS</span>
-                <p>{{ o.items }}</p>
+                <p style="white-space: pre-line;">{{ o.items }}</p>
             </div>
 
             <!-- ORDER INFORMATION -->
 
             <div class="kitchen-info">
-
                 <div>
                     <span>Order time</span>
                     <strong>{{ o.created_at }}</strong>
@@ -115,8 +114,14 @@
                     <span>Order total</span>
                     <strong>₹{{ o.total }}</strong>
                 </div>
-
             </div>
+
+            {% if o.address %}
+            <div class="kitchen-order-details">
+                <span class="eyebrow">SPECIAL INSTRUCTIONS</span>
+                <p>{{ o.address }}</p>
+            </div>
+            {% endif %}
 
             <!-- UPDATE STATUS -->
 
@@ -128,15 +133,22 @@
                 <label>Update order status</label>
 
                 <select name="status">
+                    {% for s in [
+                        'Received',
+                        'Preparing',
+                        'Ready',
+                        'Served',
+                        'Out for delivery',
+                        'Delivered',
+                        'Cancelled'
+                    ] %}
 
-                    {% for s in ['Received', 'Preparing', 'Ready', 'Served', 'Out for delivery', 'Delivered', 'Cancelled'] %}
-
-                    <option value="{{ s }}" {% if o.status == s %}selected{% endif %}>
+                    <option value="{{ s }}"
+                        {% if o.status == s %}selected{% endif %}>
                         {{ s }}
                     </option>
 
                     {% endfor %}
-
                 </select>
 
                 <button type="submit" class="btn primary">
@@ -152,7 +164,7 @@
         <div class="empty-table">
             <div style="padding:40px 15px;">
                 <h3>All caught up!</h3>
-                <p>No active orders right now. New incoming orders will appear here.</p>
+                <p>No active paid orders right now. New orders will appear here.</p>
 
                 <a href="{{ url_for('admin') }}" class="text-link">
                     Back to dashboard →
@@ -165,5 +177,13 @@
     </div>
 
 </section>
+
+<!-- AUTO REFRESH EVERY 15 SECONDS -->
+
+<script>
+    setTimeout(function () {
+        window.location.reload();
+    }, 15000);
+</script>
 
 {% endblock %}
