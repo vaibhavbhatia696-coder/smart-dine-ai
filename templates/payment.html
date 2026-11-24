@@ -1,0 +1,38 @@
+
+{% extends "base.html" %}
+
+{% block content %}
+<section class="section">
+    <div class="container" style="max-width:600px;margin:auto;">
+        <div class="card" style="padding:35px;text-align:center;">
+            <div style="font-size:48px;">💳</div>
+            <h1>Complete Your Payment</h1>
+            <p>Order #{{ order.id }}</p>
+
+            {% if order.table_number %}
+                <p>Table {{ order.table_number }}</p>
+            {% else %}
+                <p>Delivery Order</p>
+            {% endif %}
+
+            <h2 style="margin:25px 0;">₹{{ order.total }}</h2>
+
+            <p>Payment Mode: Demo Payment</p>
+            <p>This is a simulated payment for your college project.</p>
+
+            {% if order.payment_status == "Paid" %}
+                <h3>Payment Successful</h3>
+                <a href="{{ url_for('track', order_id=order.id) }}">
+                    Track Your Order
+                </a>
+            {% else %}
+                <form method="POST">
+                    <button type="submit" class="btn btn-primary">
+                        Pay ₹{{ order.total }} (Demo)
+                    </button>
+                </form>
+            {% endif %}
+        </div>
+    </div>
+</section>
+{% endblock %}
