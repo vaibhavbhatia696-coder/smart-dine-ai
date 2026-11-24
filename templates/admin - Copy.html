@@ -1,0 +1,434 @@
+
+{% extends "base.html" %}
+
+{% block title %}Admin Dashboard | SmartDine AI{% endblock %}
+
+{% block content %}
+
+<section class="dashboard wrap">
+
+    <div class="dashboard-title">
+        <div>
+            <div class="eyebrow">SMARTDINE / ADMINISTRATION</div>
+            <h1>Good evening, <em>Admin.</em></h1>
+            <p>Manage your restaurant, monitor revenue and track customer orders.</p>
+        </div>
+
+        <a class="btn primary" href="{{ url_for('home') }}">
+            View storefront ↗
+        </a>
+    </div>
+
+    <!-- STATISTICS -->
+
+    <div class="stats">
+
+        <div class="stat-card">
+            <span>Total revenue</span>
+            <b>₹{{ revenue }}</b>
+            <small>Successful payments</small>
+            <i>₹</i>
+        </div>
+
+        <div class="stat-card">
+            <span>Total orders</span>
+            <b>{{ count }}</b>
+            <small>Orders received</small>
+            <i>▤</i>
+        </div>
+
+        <div class="stat-card">
+            <span>Total customers</span>
+            <b>{{ customers }}</b>
+            <small>Unique customers</small>
+            <i>♙</i>
+        </div>
+
+        <div class="stat-card">
+            <span>Menu items</span>
+            <b>{{ menu_count }}</b>
+            <small>Total dishes</small>
+            <i>✦</i>
+        </div>
+
+    </div>
+
+
+    <!-- MENU MANAGER -->
+
+    <div class="table-panel" style="margin-top:35px;">
+
+        <div class="panel-head">
+            <div>
+                <div class="eyebrow">RESTAURANT MANAGEMENT</div>
+                <h2>Menu Manager</h2>
+                <p>Add new dishes and control which items customers can order.</p>
+            </div>
+        </div>
+
+        <!-- ADD NEW DISH -->
+
+        <div style="padding:24px;border-bottom:1px solid #eee;">
+
+            <h3 style="margin-bottom:18px;">＋ Add a new dish</h3>
+
+            <form action="{{ url_for('add_menu_item') }}" method="POST">
+
+                <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:15px;">
+
+                    <div>
+                        <label>Dish name</label>
+                        <input type="text" name="name"
+                               placeholder="e.g. Paneer Tikka"
+                               required style="width:100%;padding:12px;margin-top:7px;">
+                    </div>
+
+                    <div>
+                        <label>Category</label>
+                        <input type="text" name="category"
+                               placeholder="e.g. Starters"
+                               required style="width:100%;padding:12px;margin-top:7px;">
+                    </div>
+
+                    <div>
+                        <label>Price (₹)</label>
+                        <input type="number" name="price"
+                               placeholder="199" min="1" step="0.01"
+                               required style="width:100%;padding:12px;margin-top:7px;">
+                    </div>
+
+                    <div>
+                        <label>Dish emoji</label>
+                        <input type="text" name="emoji"
+                               placeholder="🍕"
+                               style="width:100%;padding:12px;margin-top:7px;">
+                    </div>
+
+                    <div>
+                        <label>Tag (optional)</label>
+                        <input type="text" name="tag"
+                               placeholder="Bestseller"
+                               style="width:100%;padding:12px;margin-top:7px;">
+                    </div>
+
+                    <div>
+                        <label>Description</label>
+                        <input type="text" name="description"
+                               placeholder="Describe your dish"
+                               style="width:100%;padding:12px;margin-top:7px;">
+                    </div>
+
+                </div>
+
+                <button type="submit" class="btn primary"
+                        style="margin-top:20px;">
+                    + Add Dish to Menu
+                </button>
+
+            </form>
+
+        </div>
+
+
+        <!-- EXISTING MENU ITEMS -->
+
+        <div style="padding:24px;">
+
+            <h3 style="margin-bottom:18px;">Your restaurant menu</h3>
+
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:15px;">
+
+                {% for item in menu_items %}
+
+                <div style="border:1px solid #e8e8e8;border-radius:14px;padding:18px;">
+
+                    <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;">
+
+                        <span style="font-size:30px;">
+                            {{ item['emoji'] }}
+                        </span>
+
+                        {% if item['is_available'] %}
+                            <span class="status-chip status-delivered">Available</span>
+                        {% else %}
+                            <span class="status-chip status-cancelled">Unavailable</span>
+                        {% endif %}
+
+                    </div>
+
+                    <h3 style="margin-top:12px;">
+                        {{ item['name'] }}
+                    </h3>
+
+                    <p style="font-size:13px;color:#888;">
+                        {{ item['category'] }}
+                    </p>
+
+                    <p style="margin:8px 0;">
+                        <b>₹{{ item['price'] }}</b>
+                    </p>
+
+                    <p style="font-size:13px;color:#777;margin-bottom:14px;">
+                        {{ item['description'] }}
+                    </p>
+
+                    <form action="{{ url_for('toggle_menu_item', item_id=item['id']) }}"
+                          method="POST">
+
+                        {% if item['is_available'] %}
+                            <button type="submit" class="btn"
+                                    style="width:100%;background:#fff0e9;color:#bd542e;border:1px solid #f2d1c2;">
+                                Make Unavailable
+                            </button>
+                        {% else %}
+                            <button type="submit" class="btn primary"
+                                    style="width:100%;">
+                                Make Available
+                            </button>
+                        {% endif %}
+
+                    </form>
+
+                </div>
+
+                {% else %}
+
+                <p>No menu items found. Add your first dish above.</p>
+
+                {% endfor %}
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- TABLE QR MANAGEMENT -->
+
+    <div class="table-panel" style="margin-top:35px;">
+
+        <div class="panel-head">
+            <div>
+                <div class="eyebrow">SMART TABLE ORDERING</div>
+                <h2>Table QR Management</h2>
+                <p>Generate and download a unique QR code for every restaurant table.</p>
+            </div>
+        </div>
+
+        <div style="padding:22px;">
+
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px;">
+
+                {% for table in tables %}
+
+                <div style="border:1px solid #e5e5e5;border-radius:14px;padding:20px;text-align:center;">
+
+                    <div style="font-size:30px;">🪑</div>
+
+                    <h3>Table {{ table['table_number'] }}</h3>
+
+                    <p style="font-size:13px;color:#888;">
+                        {% if table['active'] %}
+                            Active · Ready for orders
+                        {% else %}
+                            Inactive
+                        {% endif %}
+                    </p>
+
+                    {% if table['active'] %}
+
+                    <a
+                        href="{{ url_for('table_qr', table_number=table['table_number']) }}"
+                        class="btn primary"
+                        style="display:inline-block;text-decoration:none;margin-top:10px;"
+                    >
+                        ↓ Download QR
+                    </a>
+
+                    {% else %}
+
+                    <span class="status-chip status-cancelled">
+                        Inactive
+                    </span>
+
+                    {% endif %}
+
+                </div>
+
+                {% else %}
+
+                <p>No tables available.</p>
+
+                {% endfor %}
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- ORDER MANAGEMENT -->
+
+    <div class="table-panel" style="margin-top:35px;">
+
+        <div class="panel-head">
+            <div>
+                <div class="eyebrow">ORDER MANAGEMENT</div>
+                <h2>Recent orders</h2>
+                <p>Review payments, table numbers and customer order status.</p>
+            </div>
+
+            <a href="{{ url_for('kitchen') }}" class="text-link">
+                Open kitchen panel →
+            </a>
+        </div>
+
+        <div class="table-scroll">
+
+            <table>
+
+                <thead>
+                    <tr>
+                        <th>ORDER ID</th>
+                        <th>CUSTOMER</th>
+                        <th>TABLE</th>
+                        <th>ORDER DETAILS</th>
+                        <th>AMOUNT</th>
+                        <th>PAYMENT</th>
+                        <th>STATUS</th>
+                        <th>UPDATE ORDER</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    {% for o in orders %}
+
+                    <tr>
+
+                        <td>
+                            <b>#SD{{ "%04d"|format(o.id) }}</b>
+                            <small>{{ o.created_at }}</small>
+                        </td>
+
+                        <td>
+                            <b>{{ o.customer }}</b>
+                            <small>{{ o.phone }}</small>
+                        </td>
+
+                        <td>
+                            {% if o.table_number %}
+                                <b>Table {{ o.table_number }}</b>
+                            {% else %}
+                                <span>Delivery</span>
+                            {% endif %}
+                        </td>
+
+                        <td class="items-cell">
+                            {{ o.items }}
+                        </td>
+
+                        <td>
+                            <b>₹{{ o.total }}</b>
+                        </td>
+
+                        <td>
+                            {% if o.payment_status == 'Paid' %}
+                                <span class="status-chip status-delivered">Paid</span>
+                            {% else %}
+                                <span class="status-chip status-received">Pending</span>
+                            {% endif %}
+                        </td>
+
+                        <td>
+                            <span class="status-chip
+                                {% if o.status == 'Delivered' or o.status == 'Served' %}
+                                    status-delivered
+                                {% elif o.status == 'Cancelled' %}
+                                    status-cancelled
+                                {% elif o.status == 'Preparing' %}
+                                    status-preparing
+                                {% elif o.status == 'Ready' %}
+                                    status-delivered
+                                {% elif o.status == 'Out for delivery' %}
+                                    status-delivery
+                                {% else %}
+                                    status-received
+                                {% endif %}">
+                                {{ o.status }}
+                            </span>
+                        </td>
+
+                        <td>
+
+                            <form
+                                class="status-form"
+                                action="{{ url_for('update_status', order_id=o.id) }}"
+                                method="post">
+
+                                <select name="status">
+
+                                    {% for s in ['Received', 'Preparing', 'Ready', 'Served', 'Out for delivery', 'Delivered', 'Cancelled'] %}
+
+                                    <option value="{{ s }}" {% if o.status == s %}selected{% endif %}>
+                                        {{ s }}
+                                    </option>
+
+                                    {% endfor %}
+
+                                </select>
+
+                                <button type="submit">Save</button>
+
+                            </form>
+
+                        </td>
+
+                    </tr>
+
+                    {% else %}
+
+                    <tr>
+                        <td colspan="8" class="empty-table">
+                            <div style="padding:35px 10px;">
+                                <h3>No orders yet</h3>
+                                <p>Place a test order from your storefront to see it here.</p>
+                                <a href="{{ url_for('home') }}" class="text-link">
+                                    Explore menu →
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+
+    <!-- KITCHEN SHORTCUT -->
+
+    <div class="admin-bottom">
+
+        <div>
+            <span class="eyebrow">KITCHEN OPERATIONS</span>
+            <h2>Keep every order moving.</h2>
+            <p>Monitor paid orders and manage food preparation in the kitchen dashboard.</p>
+        </div>
+
+        <a href="{{ url_for('kitchen') }}" class="btn primary">
+            Go to Kitchen Panel →
+        </a>
+
+    </div>
+
+</section>
+
+{% endblock %}

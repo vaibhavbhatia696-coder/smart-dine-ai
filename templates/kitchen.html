@@ -1,0 +1,169 @@
+
+{% extends "base.html" %}
+
+{% block title %}Kitchen Display | SmartDine AI{% endblock %}
+
+{% block content %}
+
+<section class="dashboard wrap">
+
+    <div class="dashboard-title">
+        <div>
+            <div class="eyebrow">SMARTDINE / LIVE OPERATIONS</div>
+            <h1>Kitchen <em>display.</em></h1>
+            <p>Manage incoming orders and keep every dish moving.</p>
+        </div>
+
+        <a class="btn primary" href="{{ url_for('admin') }}">
+            Admin dashboard ↗
+        </a>
+    </div>
+
+    <!-- KITCHEN SUMMARY -->
+
+    <div class="kitchen-summary">
+        <div>
+            <span class="eyebrow">ACTIVE ORDERS</span>
+            <h2>{{ orders|length }}</h2>
+            <p>Orders waiting for kitchen action</p>
+        </div>
+
+        <div class="kitchen-summary-icon">♨</div>
+    </div>
+
+    <!-- ORDER CARDS -->
+
+    <div class="kitchen-grid">
+
+        {% for o in orders %}
+
+        <article class="kitchen-card">
+
+            <div class="kitchen-top">
+                <div>
+                    <span class="eyebrow">ORDER NUMBER</span>
+                    <h3>#SD{{ "%04d"|format(o.id) }}</h3>
+                </div>
+
+                <span class="status-chip
+                    {% if o.status == 'Preparing' %}
+                        status-preparing
+                    {% elif o.status == 'Out for delivery' %}
+                        status-delivery
+                    {% elif o.status == 'Ready' or o.status == 'Served' or o.status == 'Delivered' %}
+                        status-delivered
+                    {% elif o.status == 'Cancelled' %}
+                        status-cancelled
+                    {% else %}
+                        status-received
+                    {% endif %}">
+                    {{ o.status }}
+                </span>
+            </div>
+
+            <!-- CUSTOMER DETAILS -->
+
+            <div class="kitchen-customer">
+                <span>Customer</span>
+                <strong>{{ o.customer }}</strong>
+                <small>{{ o.phone }}</small>
+            </div>
+
+            <!-- TABLE DETAILS -->
+
+            <div class="kitchen-info">
+                <div>
+                    <span>Table</span>
+                    <strong>
+                        {% if o.table_number %}
+                            Table {{ o.table_number }}
+                        {% else %}
+                            Delivery
+                        {% endif %}
+                    </strong>
+                </div>
+
+                <div>
+                    <span>Payment</span>
+                    <strong>
+                        {% if o.payment_status == 'Paid' %}
+                            Paid ✓
+                        {% else %}
+                            Pending
+                        {% endif %}
+                    </strong>
+                </div>
+            </div>
+
+            <!-- ORDER ITEMS -->
+
+            <div class="kitchen-order-details">
+                <span class="eyebrow">ORDER ITEMS</span>
+                <p>{{ o.items }}</p>
+            </div>
+
+            <!-- ORDER INFORMATION -->
+
+            <div class="kitchen-info">
+
+                <div>
+                    <span>Order time</span>
+                    <strong>{{ o.created_at }}</strong>
+                </div>
+
+                <div>
+                    <span>Order total</span>
+                    <strong>₹{{ o.total }}</strong>
+                </div>
+
+            </div>
+
+            <!-- UPDATE STATUS -->
+
+            <form
+                class="kitchen-update"
+                action="{{ url_for('update_status', order_id=o.id) }}"
+                method="post">
+
+                <label>Update order status</label>
+
+                <select name="status">
+
+                    {% for s in ['Received', 'Preparing', 'Ready', 'Served', 'Out for delivery', 'Delivered', 'Cancelled'] %}
+
+                    <option value="{{ s }}" {% if o.status == s %}selected{% endif %}>
+                        {{ s }}
+                    </option>
+
+                    {% endfor %}
+
+                </select>
+
+                <button type="submit" class="btn primary">
+                    Update order →
+                </button>
+
+            </form>
+
+        </article>
+
+        {% else %}
+
+        <div class="empty-table">
+            <div style="padding:40px 15px;">
+                <h3>All caught up!</h3>
+                <p>No active orders right now. New incoming orders will appear here.</p>
+
+                <a href="{{ url_for('admin') }}" class="text-link">
+                    Back to dashboard →
+                </a>
+            </div>
+        </div>
+
+        {% endfor %}
+
+    </div>
+
+</section>
+
+{% endblock %}

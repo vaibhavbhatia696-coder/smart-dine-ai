@@ -1,0 +1,299 @@
+
+{% extends "base.html" %}
+
+{% block title %}{{ restaurant.restaurant_name }} | SmartDine AI{% endblock %}
+
+{% block content %}
+
+<section class="hero wrap">
+    <div class="hero-copy">
+        <div class="eyebrow"><span></span> GOOD FOOD. BETTER EXPERIENCES.</div>
+
+        <h1>
+            Taste the<br>
+            <em>extraordinary.</em>
+        </h1>
+
+        <p>
+            From handcrafted favourites to irresistible new flavours,
+            discover food that makes every moment memorable.
+        </p>
+
+        <div class="hero-actions">
+            <a href="#menu" class="btn primary">Explore our menu <span>↗</span></a>
+            <a href="#why" class="text-link">Discover our story →</a>
+        </div>
+
+        <div class="hero-proof">
+            <div class="proof-item">
+                <b>{{ items|length }}+</b>
+                <span>Delicious choices</span>
+            </div>
+            <div class="proof-divider"></div>
+            <div class="proof-item">
+                <b>100%</b>
+                <span>Made with care</span>
+            </div>
+            <div class="proof-divider"></div>
+            <div class="proof-item">
+                <b>Fresh</b>
+                <span>Every single day</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="hero-art">
+        <div class="hero-image-frame">
+            <img
+                src="https://images.unsplash.com/photo-1513104890138-7c749659a591?w=1100&auto=format&fit=crop&q=85"
+                alt="Freshly prepared gourmet pizza">
+        </div>
+
+        <div class="hero-stamp">
+            <span>MADE WITH</span>
+            <b>LOVE.</b>
+            <span>SERVED FRESH.</span>
+        </div>
+
+        <div class="hero-floating">
+            <span>✦</span>
+            <div>
+                <b>Freshly prepared</b>
+                <small>Quality in every bite</small>
+            </div>
+        </div>
+
+        <div class="hero-number">01 / 04</div>
+    </div>
+</section>
+
+{% if restaurant and table_number %}
+<section class="wrap" style="margin-top:20px;">
+    <div class="benefits" style="padding:20px 25px;">
+        <div class="benefit-heading">
+            <span>WELCOME TO</span>
+            <h2>{{ restaurant.restaurant_name }}</h2>
+        </div>
+        <div class="benefit-item">
+            <span class="benefit-icon">⌂</span>
+            <b>Table {{ table_number }}</b>
+            <small>Scan-to-order dining</small>
+        </div>
+        <div class="benefit-item">
+            <span class="benefit-icon">✦</span>
+            <b>Order at your table</b>
+            <small>Freshly prepared for you</small>
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<section class="benefits wrap" id="why">
+    <div class="benefit-heading">
+        <span>THE SMARTDINE PROMISE</span>
+        <h2>More than just<br><em>a meal.</em></h2>
+    </div>
+
+    <div class="benefit-item">
+        <span class="benefit-icon">✳</span>
+        <b>Fresh Ingredients</b>
+        <small>Carefully selected quality</small>
+    </div>
+
+    <div class="benefit-item">
+        <span class="benefit-icon">♨</span>
+        <b>Made to Order</b>
+        <small>Fresh from our kitchen</small>
+    </div>
+
+    <div class="benefit-item">
+        <span class="benefit-icon">♡</span>
+        <b>Made with Love</b>
+        <small>Every bite matters</small>
+    </div>
+</section>
+
+<section class="menu-section wrap" id="menu">
+
+    <div class="menu-topline">
+        <span>DISCOVER OUR COLLECTION</span>
+        <span>GOOD TASTE STARTS HERE ✦</span>
+    </div>
+
+    <div class="section-head">
+        <div>
+            <h2>Find your next<br><em>favourite.</em></h2>
+            <p>Beautifully prepared. Seriously delicious.</p>
+        </div>
+
+        <div class="menu-search">
+            <span>⌕</span>
+            <input
+                id="search"
+                placeholder="Search your cravings..."
+                oninput="filterMenu()">
+        </div>
+    </div>
+
+    <div class="categories">
+        <button
+            class="category active"
+            onclick="setCategory('All', this)">
+            All
+        </button>
+
+        {% for c in categories %}
+        <button
+            class="category"
+            onclick="setCategory({{ c|tojson }}, this)">
+            {{ c }}
+        </button>
+        {% endfor %}
+    </div>
+
+    <div class="food-grid" id="food-grid">
+
+        {% for item in items %}
+
+        <article
+            class="food-card"
+            data-id="{{ item.id }}"
+            data-category="{{ item.category }}"
+            data-name="{{ item.name|lower }}"
+            data-price="{{ item.price }}">
+
+            <div class="food-image">
+
+                {% if item.category == "Pizza" %}
+                <img src="https://images.unsplash.com/photo-1579751626657-72bc17010498?w=650&auto=format&fit=crop&q=80" alt="{{ item.name }}">
+
+                {% elif item.category == "Pasta" %}
+                <img src="https://images.unsplash.com/photo-1473093295043-cdd812d0e601?w=650&auto=format&fit=crop&q=80" alt="{{ item.name }}">
+
+                {% elif item.category == "Burgers" %}
+                <img src="https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=650&auto=format&fit=crop&q=80" alt="{{ item.name }}">
+
+                {% elif item.category == "Sides" %}
+                <img src="https://images.unsplash.com/photo-1573080496219-bb080dd4f877?w=650&auto=format&fit=crop&q=80" alt="{{ item.name }}">
+
+                {% elif item.category == "Healthy" %}
+                <img src="https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=650&auto=format&fit=crop&q=80" alt="{{ item.name }}">
+
+                {% elif item.category == "Desserts" %}
+                <img src="https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=650&auto=format&fit=crop&q=80" alt="{{ item.name }}">
+
+                {% else %}
+                <img src="https://images.unsplash.com/photo-1546173159-315724a31696?w=650&auto=format&fit=crop&q=80" alt="{{ item.name }}">
+                {% endif %}
+
+                {% if item.tag %}
+                <span class="food-tag">{{ item.tag }}</span>
+                {% endif %}
+
+                <button
+                    class="add-btn"
+                    type="button"
+                    onclick="addToCart({{ item.id }})">
+                    +
+                </button>
+            </div>
+
+            <div class="food-info">
+
+                <div class="food-meta">
+                    <span>{{ item.category }}</span>
+                    <span class="food-rating">★ 4.9</span>
+                </div>
+
+                <h3>{{ item.name }}</h3>
+
+                <p>{{ item.description }}</p>
+
+                <div class="food-bottom">
+                    <b>₹{{ item.price }}</b>
+                    <button
+                        type="button"
+                        onclick="addToCart({{ item.id }})">
+                        ADD TO CART <span>+</span>
+                    </button>
+                </div>
+
+            </div>
+        </article>
+
+        {% endfor %}
+
+    </div>
+
+    <div class="empty-state" id="empty-state" hidden>
+        No dishes found. Try another search.
+    </div>
+
+</section>
+
+<section class="cta wrap">
+    <div class="cta-content">
+        <span>YOUR NEXT CRAVING IS WAITING</span>
+        <h2>Good food.<br><em>Good times.</em></h2>
+        <p>Make your everyday moments a little more delicious.</p>
+    </div>
+
+    <a href="#menu" class="btn dark">Explore the menu ↗</a>
+
+    <div class="cta-decoration">S.</div>
+</section>
+
+<div class="cart-drawer" id="cart-drawer">
+
+    <div class="drawer-head">
+        <div>
+            <small>SMARTDINE CHECKOUT</small>
+            <h3>Your selection.</h3>
+        </div>
+        <button type="button" onclick="closeCart()">✕</button>
+    </div>
+
+    <div class="drawer-items" id="drawer-items">
+        <p class="muted">Your cart is waiting for something delicious.</p>
+    </div>
+
+    <div class="drawer-total">
+        <span>Estimated total</span>
+        <b id="cart-total">₹0</b>
+    </div>
+
+    <form action="{{ url_for('checkout') }}" method="post" class="checkout-form">
+        <h4>Table order details</h4>
+
+        <input
+            name="customer"
+            placeholder="Your full name"
+            autocomplete="name"
+            required>
+
+        <input
+            name="phone"
+            type="tel"
+            placeholder="Phone number"
+            autocomplete="tel"
+            required>
+
+        <textarea
+            name="address"
+            placeholder="Special instructions (optional)"></textarea>
+
+        <button class="btn primary full" type="submit">
+            Continue to payment ↗
+        </button>
+    </form>
+
+</div>
+
+<button
+    type="button"
+    class="drawer-overlay"
+    id="drawer-overlay"
+    onclick="closeCart()">
+</button>
+
+{% endblock %}

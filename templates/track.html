@@ -1,0 +1,119 @@
+
+{% extends "base.html" %}
+
+{% block title %}Order #{{ order.id }} | SmartDine AI{% endblock %}
+
+{% block content %}
+
+{% set steps = ['Received', 'Preparing', 'Out for delivery', 'Delivered'] %}
+{% set current_index = steps.index(order.status) if order.status in steps else -1 %}
+
+<section class="status-page wrap">
+    <div class="status-card">
+
+        <div class="success-icon">
+            {% if order.status == 'Cancelled' %}×{% else %}✓{% endif %}
+        </div>
+
+        <div class="eyebrow">
+            {% if order.status == 'Cancelled' %}
+                ORDER CANCELLED
+            {% else %}
+                ORDER CONFIRMED
+            {% endif %}
+        </div>
+
+        <h1>
+            {% if order.status == 'Cancelled' %}
+                Order cancelled
+            {% else %}
+                Thanks, {{ order.customer }}!
+            {% endif %}
+        </h1>
+
+        <p>
+            {% if order.status == 'Cancelled' %}
+                This order has been cancelled.
+            {% else %}
+                Your delicious choice is in good hands. Here's your order summary.
+            {% endif %}
+        </p>
+
+        <div class="order-number">
+            <strong>ORDER #SD{{ "%04d"|format(order.id) }}</strong>
+            <span>{{ order.created_at }}</span>
+        </div>
+
+        <div class="order-details">
+            <div class="order-items">
+                <span class="eyebrow">YOUR ORDER</span>
+                <p>{{ order.items }}</p>
+            </div>
+
+            <div class="order-total">
+                <span>Total amount</span>
+                <b>₹{{ order.total }}</b>
+            </div>
+        </div>
+
+        <div class="tracking">
+            <h3>Order progress</h3>
+
+            {% if order.status == 'Cancelled' %}
+
+                <div class="cancelled-status">
+                    <span>×</span>
+                    <div>
+                        <strong>Order Cancelled</strong>
+                        <p>Your order will not be delivered.</p>
+                    </div>
+                </div>
+
+            {% else %}
+
+                <div class="progress-steps">
+                    {% for step in steps %}
+                        <div class="step {% if loop.index0 <= current_index %}done{% endif %}">
+                            <i>
+                                {% if loop.index == 1 %}✓
+                                {% elif loop.index == 2 %}♨
+                                {% elif loop.index == 3 %}⌁
+                                {% else %}⌂
+                                {% endif %}
+                            </i>
+                            <span>{{ step }}</span>
+                        </div>
+                    {% endfor %}
+                </div>
+
+                <p class="current-status">
+                    Current status:
+                    <b>{{ order.status }}</b>
+                </p>
+
+            {% endif %}
+        </div>
+
+        <div class="delivery-details">
+            <div>
+                <span>Customer</span>
+                <strong>{{ order.customer }}</strong>
+            </div>
+            <div>
+                <span>Phone</span>
+                <strong>{{ order.phone }}</strong>
+            </div>
+            <div>
+                <span>Delivery address</span>
+                <strong>{{ order.address }}</strong>
+            </div>
+        </div>
+
+        <a href="{{ url_for('home') }}" class="btn primary full">
+            Back to menu
+        </a>
+
+    </div>
+</section>
+
+{% endblock %}

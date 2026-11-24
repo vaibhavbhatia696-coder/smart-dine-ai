@@ -1,0 +1,119 @@
+
+{% extends "base.html" %}
+
+{% block title %}Owner Login | SmartDine AI{% endblock %}
+
+{% block content %}
+<section class="auth-section">
+    <div class="auth-card">
+        <div class="auth-eyebrow">SMARTDINE AI / OWNER PORTAL</div>
+
+        <h1>Welcome <em>Back.</em></h1>
+        <p class="auth-description">
+            Login to manage your restaurant, tables, QR codes and orders.
+        </p>
+
+        <form method="POST" action="{{ url_for('login') }}">
+            <label>Email Address</label>
+            <input
+                type="email"
+                name="email"
+                placeholder="Enter your email"
+                required
+            >
+
+            <label>Password</label>
+            <input
+                type="password"
+                name="password"
+                placeholder="Enter your password"
+                required
+            >
+
+            <button type="submit" class="auth-button">
+                Login to Dashboard →
+            </button>
+        </form>
+
+        <div class="auth-footer">
+            Don't have an account?
+            <a href="{{ url_for('register') }}">Create Restaurant Account</a>
+        </div>
+    </div>
+</section>
+
+<style>
+.auth-section {
+    min-height: 75vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 50px 20px;
+}
+.auth-card {
+    width: 100%;
+    max-width: 460px;
+    padding: 42px;
+    border-radius: 22px;
+    background: white;
+    box-shadow: 0 15px 55px rgba(0,0,0,.08);
+}
+.auth-eyebrow {
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 2px;
+    color: #d86a40;
+    margin-bottom: 18px;
+}
+.auth-card h1 {
+    font-size: 38px;
+    margin: 0 0 10px;
+}
+.auth-card h1 em {
+    color: #e4774c;
+    font-style: normal;
+}
+.auth-description {
+    color: #777;
+    line-height: 1.7;
+    margin-bottom: 28px;
+}
+.auth-card label {
+    display: block;
+    font-weight: 700;
+    font-size: 13px;
+    margin: 17px 0 8px;
+}
+.auth-card input {
+    width: 100%;
+    padding: 14px;
+    border: 1px solid #e6e1dc;
+    border-radius: 10px;
+    font: inherit;
+    box-sizing: border-box;
+}
+.auth-button {
+    width: 100%;
+    padding: 15px;
+    margin-top: 25px;
+    border: none;
+    border-radius: 10px;
+    background: #e4774c;
+    color: white;
+    font-size: 15px;
+    font-weight: 800;
+    cursor: pointer;
+}
+.auth-footer {
+    text-align: center;
+    margin-top: 25px;
+    font-size: 13px;
+    color: #777;
+}
+.auth-footer a {
+    color: #d86a40;
+    font-weight: 800;
+    text-decoration: none;
+}
+</style>
+{% endblock %}
